@@ -57,27 +57,37 @@ def transition_model(corpus, page, damping_factor):
     linked to by `page`. With probability `1 - damping_factor`, choose
     a link at random chosen from all pages in the corpus.
     """
+    # get a list of all the pages
+    all_pages = []
+    for key in corpus:
+        all_pages.append(key)
+
+    # get a list of all the pages the current page links to
+    linked_pages = corpus[page]
+
+    # if page has no links, return probability distribution that chooses at random from all pages
+    if len(linked_pages) == 0:
+        transition_dictionary = {}
+        all_page_probability = (float(100) / len(all_pages)) / 100
+    # calculate probability with damping
+    linked_page_probability = damping_factor * ((float(100) / len(linked_pages)) / 100)
+
+    # calculate probability with 1 - damping
+    all_page_probability = (1 - damping_factor) * ((float(100) / len(all_pages)) / 100)
+
+    # create the dictionary
+    transition_dictionary = {}
+    for element in linked_pages:
+        transition_dictionary[element] = linked_page_probability + all_page_probability
+
+    for element in all_pages:
+        if element not in transition_dictionary:
+            transition_dictionary[element] = all_page_probability
+
+    return transition_dictionary
+
+
     
-    random_number = random.randint(0, 100) / 100
-
-    if random_number < damping_factor:
-        # get a list of all the
-        all_links = corpus[page]
-      
-    if random_number > damping_factor:
-        # get a list of all the pages
-        all_pages = []
-        for page in corpus:
-            all_pages.append(page)
-
-        # from all pages, choose a random page with equal probability
-        page_probability = (float(100) / (len(all_pages))) / 100
-        probability_dictionary = {}
-
-        for page in all_pages:
-            probability_dictionary[page] = page_probability
-
-        return probability_dictionary
 
 
 
@@ -99,7 +109,7 @@ def sample_pagerank(corpus, damping_factor, n):
     random_index = random.randint(0, len(all_pages) - 1)
     random_page = all_pages[random_index]
 
-    transition_model(corpus, random_page, damping_factor)
+    probability_dictionary = transition_model(corpus, random_page, damping_factor)
     
 
 def iterate_pagerank(corpus, damping_factor):
