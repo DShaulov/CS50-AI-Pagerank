@@ -69,6 +69,12 @@ def transition_model(corpus, page, damping_factor):
     if len(linked_pages) == 0:
         transition_dictionary = {}
         all_page_probability = (float(100) / len(all_pages)) / 100
+
+        for element in all_pages:
+            transition_dictionary[element] = all_page_probability
+
+        return transition_dictionary
+            
     # calculate probability with damping
     linked_page_probability = damping_factor * ((float(100) / len(linked_pages)) / 100)
 
