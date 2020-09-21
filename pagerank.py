@@ -165,7 +165,6 @@ def iterate_pagerank(corpus, damping_factor):
     for page in all_pages:
         page_rank[page] = 1 / float(len(all_pages))
 
-    print("page_rank before: ", page_rank)
     
     times_repeated = 0
     #?##########################################################################################################
@@ -175,37 +174,55 @@ def iterate_pagerank(corpus, damping_factor):
             for page in all_pages:
                 values.add(page)
     #?##########################################################################################################
-    print("Corpus: ", corpus)
 
+    while True:
+        # create a new page rank dictionary
+        new_page_rank = {}
+        for key, value in page_rank.items():
+            new_page_rank[key] = value
 
-    for page in page_rank:
-        page_rank_formula_first = float((1 - damping_factor)) / len(all_pages)
-        print("page rank formula first ", page_rank_formula_first)
-        page_rank_formula_second = 0
+        for page in new_page_rank:
+            page_rank_formula_first = float((1 - damping_factor)) / len(all_pages)
+            page_rank_formula_second = 0
 
-        # get a list of all pages that link to the page
-        all_pages_that_link = []
-        # go over every page and see if it links to the original page
-        for a_page in all_pages:
-            if page in corpus[a_page]:
-                all_pages_that_link.append(a_page)
+            # get a list of all pages that link to the page
+            all_pages_that_link = []
+            # go over every page and see if it links to the original page
+            for a_page in all_pages:
+                if page in corpus[a_page]:
+                    all_pages_that_link.append(a_page)
 
-        
-        # iterate over every page that links to the original page
-        for linking_page in all_pages_that_link:
-            page_rank_formula_second = page_rank_formula_second + (float(page_rank[linking_page]) / len(corpus[linking_page]))
+            
+            # iterate over every page that links to the original page
+            for linking_page in all_pages_that_link:
+                page_rank_formula_second = page_rank_formula_second + (float(new_page_rank[linking_page]) / len(corpus[linking_page]))
 
-        page_rank_formula_second = page_rank_formula_second * damping_factor 
+            page_rank_formula_second = page_rank_formula_second * damping_factor 
 
-        page_rank[page] = page_rank_formula_first + page_rank_formula_second
+            new_page_rank[page] = page_rank_formula_first + page_rank_formula_second
 
-    print("page rank after: ", page_rank)
-    sum_check = 0
+        # compare old page rank and new one, and see what the difference in values is
+        largest_difference = 0
+        for key in corpus:
+            delta = abs(page_rank[key] - new_page_rank[key])
+            if delta > largest_difference:
+                largest_difference = delta
+
+        # if the values change by no more than 0.001%, break the while loop
+        if largest_difference <= 0.001:
+            break
+
+        # if the values still change too much, change the current page rank and continue the loop
+        page_rank = new_page_rank
+
+    #? TEST #
+    """ sum_check = 0
     for value in page_rank.values():
-        print(value)
         sum_check = sum_check + value
 
-    print("Sum check: ", sum_check)
+    print("Sum check: ", sum_check) """
+
+    return page_rank
 
     
 
