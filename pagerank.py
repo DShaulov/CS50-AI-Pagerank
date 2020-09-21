@@ -113,10 +113,39 @@ def sample_pagerank(corpus, damping_factor, n):
 
     # Choose a page at random
     random_index = random.randint(0, len(all_pages) - 1)
-    random_page = all_pages[random_index]
+    sampling_page = all_pages[random_index]
+    all_samples = []
 
-    probability_dictionary = transition_model(corpus, random_page, damping_factor)
-    
+
+    while n != 0:
+        n = n - 1
+        transition_blueprint = transition_model(corpus, sampling_page, damping_factor)
+        weights = []
+        for value in transition_blueprint.values():
+            weights.append(value)
+
+        all_pages = []
+        for key in transition_blueprint.keys():
+            all_pages.append(key)
+
+        sample = random.choices(
+            population= all_pages,
+            weights= weights
+        )
+        all_samples.append(sample[0])
+        sampling_page = sample[0]
+
+    sample_amount = len(all_samples)
+    page_rank = {}
+    for page in all_pages:
+        total_count = 0
+        for sample in all_samples:
+            if page == sample:
+                total_count = total_count + 1
+
+        page_rank[page] = total_count / sample_amount
+
+    return page_rank
 
 def iterate_pagerank(corpus, damping_factor):
     """
@@ -127,7 +156,59 @@ def iterate_pagerank(corpus, damping_factor):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
-    raise NotImplementedError
+    # get a list of all the pages
+    all_pages = []
+    page_rank = {}
+    for page in corpus:
+        all_pages.append(page)
+
+    for page in all_pages:
+        page_rank[page] = 1 / float(len(all_pages))
+
+    print("page_rank before: ", page_rank)
+    
+    times_repeated = 0
+    #?##########################################################################################################
+    #? a page that has no links at all should be treated as if having links to all other pages, including itself
+    for values in corpus.values():
+        if len(values) == 0:
+            for page in all_pages:
+                values.add(page)
+    #?##########################################################################################################
+    print("Corpus: ", corpus)
+
+
+    for page in page_rank:
+        page_rank_formula_first = float((1 - damping_factor)) / len(all_pages)
+        print("page rank formula first ", page_rank_formula_first)
+        page_rank_formula_second = 0
+
+        # get a list of all pages that link to the page
+        all_pages_that_link = []
+        # go over every page and see if it links to the original page
+        for a_page in all_pages:
+            if page in corpus[a_page]:
+                all_pages_that_link.append(a_page)
+
+        
+        # iterate over every page that links to the original page
+        for linking_page in all_pages_that_link:
+            page_rank_formula_second = page_rank_formula_second + (float(page_rank[linking_page]) / len(corpus[linking_page]))
+
+        page_rank_formula_second = page_rank_formula_second * damping_factor 
+
+        page_rank[page] = page_rank_formula_first + page_rank_formula_second
+
+    print("page rank after: ", page_rank)
+    sum_check = 0
+    for value in page_rank.values():
+        print(value)
+        sum_check = sum_check + value
+
+    print("Sum check: ", sum_check)
+
+    
+
 
 
 if __name__ == "__main__":
