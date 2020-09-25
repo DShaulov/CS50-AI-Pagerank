@@ -1,0 +1,49 @@
+random_number = random.randint(0, 100) / 100
+
+if random_number < damping_factor:
+        # get a list of all the pages the current page links to
+        all_linked_pages = corpus[page]
+        page_probability = (float(100) / len(all_linked_pages)) / 100
+
+        probability_dictionary = {}
+        for page in all_linked_pages:
+            probability_dictionary[page] = page_probability
+
+        print(probability_dictionary)
+        return probability_dictionary
+
+      
+    if random_number > damping_factor:
+        # get a list of all the pages
+        all_pages = []
+        for page in corpus:
+            all_pages.append(page)
+
+        # from all pages, choose a random page with equal probability
+        page_probability = (float(100) / len(all_pages)) / 100
+        probability_dictionary = {}
+
+        for page in all_pages:
+            probability_dictionary[page] = page_probability
+
+        print(probability_dictionary)
+        return probability_dictionary
+
+
+
+
+#### A page that has no links at all should be interpreted as having one link for every page in the corpus (including itself) ####
+if len(links) == 0:
+    for all_page in all_pages:
+        links.add(all_page)
+###################################################################################################################################
+
+
+
+
+
+
+
+
+####################################################################################################################################
+

@@ -2,6 +2,7 @@ import os
 import random
 import re
 import sys
+import copy
 
 DAMPING = 0.85
 SAMPLES = 10000
@@ -195,7 +196,7 @@ def iterate_pagerank(corpus, damping_factor):
             
             # iterate over every page that links to the original page
             for linking_page in all_pages_that_link:
-                page_rank_formula_second = page_rank_formula_second + (float(new_page_rank[linking_page]) / len(corpus[linking_page]))
+                page_rank_formula_second = page_rank_formula_second + (float(page_rank[linking_page]) / len(corpus[linking_page]))
 
             page_rank_formula_second = page_rank_formula_second * damping_factor 
 
@@ -216,13 +217,16 @@ def iterate_pagerank(corpus, damping_factor):
         page_rank = new_page_rank
 
     #? TEST #
-    """ sum_check = 0
+    sum_check = 0
     for value in page_rank.values():
         sum_check = sum_check + value
 
-    print("Sum check: ", sum_check) """
+    print("Sum check: ", sum_check)
 
     return page_rank
+        
+        
+
 
     
 

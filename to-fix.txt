@@ -1,0 +1,3 @@
+A) Iteration results for at least one of the primary corpuses we test with are off by more than the allowable tolerance limit (0.001)
+
+1) The sum off all ranks is off, for corpus2, its 1.0119 instead of 1
